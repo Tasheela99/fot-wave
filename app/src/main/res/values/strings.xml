@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FotWaveNewsApp</string>
+    <string-array name="news_type_array">
+        <item>Sports</item>
+        <item>Events</item>
+        <item>Academic</item>
+    </string-array>
+
+</resources>
