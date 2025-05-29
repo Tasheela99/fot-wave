@@ -197,11 +197,22 @@ public class SportsNewsActivity extends BaseActivity {
         readButton.setTextColor(getColor(android.R.color.white));
 
         // Add click listener for the button
+        // UPDATED: Add click listener for the button to open NewsDetailActivity
         readButton.setOnClickListener(v -> {
-            // Handle read news action
-            Toast.makeText(SportsNewsActivity.this, "Opening: " + news.getTitle(), Toast.LENGTH_SHORT).show();
-            // You can add navigation to detailed news activity here
+            // Create intent to open NewsDetailActivity
+            Intent intent = new Intent(SportsNewsActivity.this, NewsDetailActivity.class);
+
+            // Pass news data to the new activity
+            intent.putExtra("news_title", news.getTitle());
+            intent.putExtra("news_content", news.getContent());
+            intent.putExtra("news_description", news.getDescription());
+            intent.putExtra("news_date", news.getDate());
+            intent.putExtra("news_image_url", news.getImageUrl());
+
+            // Start the new activity
+            startActivity(intent);
         });
+
 
         // Add views to content layout
         contentLayout.addView(titleTextView);

@@ -47,4 +47,5 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation (libs.picasso)
     implementation (libs.cardview)
+
 }

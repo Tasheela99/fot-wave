@@ -55,6 +55,16 @@
             android:name=".AddNewsActivity"
             android:exported="true"
              android:screenOrientation="portrait" />
+        <activity
+            android:name=".NewsDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".AcademicNewsActivity"
+            android:theme="@style/Theme.FotWaveNewsApp">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AcademicNewsActivity" />
+        </activity>
+
     </application>
 
 </manifest>

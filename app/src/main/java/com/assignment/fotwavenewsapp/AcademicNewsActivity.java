@@ -86,7 +86,7 @@ public class AcademicNewsActivity extends BaseActivity {
 
     private void fetchAcademicNews() {
         db.collection("news")
-                .whereEqualTo("newsType", "Academic")
+                .whereEqualTo("newsType", "academic")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -195,11 +195,20 @@ public class AcademicNewsActivity extends BaseActivity {
         readButton.setBackgroundTintList(getColorStateList(android.R.color.holo_green_light));
         readButton.setTextColor(getColor(android.R.color.white));
 
-        // Add click listener for the button
+        // UPDATED: Add click listener for the button to open NewsDetailActivity
         readButton.setOnClickListener(v -> {
-            // Handle read news action
-            Toast.makeText(AcademicNewsActivity.this, "Opening: " + news.getTitle(), Toast.LENGTH_SHORT).show();
-            // You can add navigation to detailed news activity here
+            // Create intent to open NewsDetailActivity
+            Intent intent = new Intent(AcademicNewsActivity.this, NewsDetailActivity.class);
+
+            // Pass news data to the new activity
+            intent.putExtra("news_title", news.getTitle());
+            intent.putExtra("news_content", news.getContent());
+            intent.putExtra("news_description", news.getDescription());
+            intent.putExtra("news_date", news.getDate());
+            intent.putExtra("news_image_url", news.getImageUrl());
+
+            // Start the new activity
+            startActivity(intent);
         });
 
         // Add views to content layout
