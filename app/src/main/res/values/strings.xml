@@ -1,9 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FotWaveNewsApp</string>
+    <string name="app_name">FotWave News App</string>
     <string-array name="news_type_array">
-        <item>Sports</item>
-        <item>Events</item>
-        <item>Academic</item>
+        <item>academic</item>
+        <item>events</item>
+        <item>sports</item>
     </string-array>
 
+    <!-- Navigation Menu Items -->
+    <string name="nav_academic">Academic</string>
+    <string name="nav_events">Events</string>
+    <string name="nav_sports">Sports</string>
+
+    <!-- Other strings -->
+    <string name="add_news">Add News</string>
+    <string name="submit_news">Submit News</string>
+    <string name="select_image">Select Image</string>
 </resources>

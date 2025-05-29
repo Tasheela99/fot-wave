@@ -11,8 +11,8 @@
         android:id="@+id/dropdown_anchor"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#2196F3"
-        app:title="Upcoming Events"
+        android:background="#4CAF50"
+        app:title="Tasheela Jayawickrama"
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/menu"
         app:menu="@menu/toolbar_menu" />
@@ -25,78 +25,13 @@
         android:padding="16dp">
 
         <LinearLayout
+            android:id="@+id/news_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Example Event Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+            <!-- News cards will be added dynamically here -->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_launcher_foreground" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:background="#E3F2FD">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tech Talk 2025: AI in Everyday Life"
-                            android:textStyle="bold"
-                            android:textSize="16sp"
-                            android:textColor="#000000" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Join us for an enlightening discussion on how AI is transforming modern living."
-                            android:textColor="#1E88E5"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2025-02-20"
-                            android:textColor="#666666"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Explore the latest advancements in artificial intelligence with guest speakers from top tech companies."
-                            android:textColor="#333333"
-                            android:layout_marginTop="8dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="View Details"
-                            android:backgroundTint="#2196F3"
-                            android:textColor="@android:color/white"
-                            android:layout_marginTop="12dp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Add more event cards dynamically if needed -->
         </LinearLayout>
     </ScrollView>
 
