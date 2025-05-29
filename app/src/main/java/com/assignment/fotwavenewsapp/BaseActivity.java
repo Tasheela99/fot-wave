@@ -82,7 +82,9 @@ public class BaseActivity extends AppCompatActivity {
                 Log.d(TAG, "Popup menu item clicked: " + id);
 
                 if (id == R.id.menu_user_info) {
-                    Toast.makeText(this, "User Information", Toast.LENGTH_SHORT).show();
+                    // Open UserInfoActivity instead of showing toast
+                    Intent intent = new Intent(this, UserInfoActivity.class);
+                    startActivity(intent);
                     return true;
                 } else if (id == R.id.menu_dev_info) {
                     Toast.makeText(this, "Developer Information", Toast.LENGTH_SHORT).show();
