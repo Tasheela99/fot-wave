@@ -5,8 +5,13 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.assignment.fotwavenewsapp.model.News;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.squareup.picasso.Picasso;
 
 public class NewsDetailActivity extends BaseActivity {
@@ -17,6 +22,7 @@ public class NewsDetailActivity extends BaseActivity {
     private TextView newsContentTextView;
     private TextView newsDescriptionTextView;
     private MaterialToolbar toolbar;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +32,7 @@ public class NewsDetailActivity extends BaseActivity {
         initializeViews();
         setupToolbar();
         loadNewsData();
+        setupBottomNavigation();
     }
 
     private void initializeViews() {
@@ -35,6 +42,7 @@ public class NewsDetailActivity extends BaseActivity {
         newsContentTextView = findViewById(R.id.news_detail_content);
         newsDescriptionTextView = findViewById(R.id.news_detail_description);
         toolbar = findViewById(R.id.toolbar);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
     }
 
     private void setupToolbar() {
@@ -72,6 +80,28 @@ public class NewsDetailActivity extends BaseActivity {
                 newsImageView.setImageResource(R.drawable.ic_launcher_foreground);
             }
         }
+    }
+
+    private void setupBottomNavigation() {
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_sports) {
+                    startActivity(new Intent(NewsDetailActivity.this, SportsNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.nav_events) {
+                    startActivity(new Intent(NewsDetailActivity.this, EventsNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.nav_academic) {
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override

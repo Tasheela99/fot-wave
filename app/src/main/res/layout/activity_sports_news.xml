@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/dropdown_anchor"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="#4CAF50"
-        app:title="Sports"
-        app:titleTextColor="@android:color/white"
+        android:paddingTop="15dp"
+        app:menu="@menu/toolbar_menu"
         app:navigationIcon="@drawable/menu"
-        app:menu="@menu/toolbar_menu" />
+        app:title="Sports"
+        app:titleTextColor="@android:color/white" />
 
     <!-- Scrollable content -->
     <ScrollView
@@ -40,9 +41,9 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/bottom_nav_menu"
         android:background="#ffffff"
         app:itemIconTint="@color/nav_item_color"
-        app:itemTextColor="@color/nav_item_color" />
+        app:itemTextColor="@color/nav_item_color"
+        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

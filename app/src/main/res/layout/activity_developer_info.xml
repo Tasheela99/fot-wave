@@ -3,19 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="#F5F5F5"
+    android:orientation="vertical">
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/dropdown_anchor"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="#4CAF50"
-        app:title="Developer Info"
-        app:titleTextColor="@android:color/white"
+        android:paddingTop="15dp"
+        app:menu="@menu/toolbar_menu"
         app:navigationIcon="@drawable/menu"
-        app:menu="@menu/toolbar_menu" />
+        app:title="Developer Info"
+        app:titleTextColor="@android:color/white" />
 
     <!-- Main Content -->
     <ScrollView
@@ -35,65 +36,65 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_marginBottom="20dp"
-                android:scaleType="centerCrop"
                 android:contentDescription="Developer Image"
+                android:scaleType="centerCrop"
                 android:src="@drawable/developer" />
 
             <!-- Content with padding -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:padding="24dp"
-                android:gravity="center_horizontal">
+                android:padding="24dp">
 
                 <!-- Username -->
                 <TextView
                     android:id="@+id/tv_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tasheela Jayawickrama"
-                    android:textSize="24sp"
-                    android:textColor="#333333"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="sans-serif-medium"
-                    android:layout_marginBottom="8dp" />
+                    android:text="Tasheela Jayawickrama"
+                    android:textColor="#333333"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/tv_index_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:text="2020T00880"
-                    android:textSize="20sp"
                     android:textColor="#666666"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="20sp" />
 
                 <!-- User Details -->
                 <TextView
                     android:id="@+id/tv_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:text="2020t00880@stu.cmb.ac.lk"
-                    android:textSize="16sp"
                     android:textColor="#666666"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/tv_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:text="0766308272"
-                    android:textSize="16sp"
                     android:textColor="#666666"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="16sp" />
 
                 <!-- Buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginBottom="24dp"
                     android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:weightSum="2">
 
                     <!-- Email Me Button -->
@@ -105,10 +106,10 @@
                         android:layout_weight="1"
                         android:text="Email Me"
                         android:textColor="#1AC428"
+                        app:backgroundTint="#FFFFFF"
                         app:cornerRadius="24dp"
                         app:strokeColor="#1AC428"
-                        app:strokeWidth="2dp"
-                        app:backgroundTint="#FFFFFF" />
+                        app:strokeWidth="2dp" />
 
                     <!-- Call Me Button -->
                     <com.google.android.material.button.MaterialButton
@@ -132,8 +133,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffff"
-        app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/nav_item_color"
-        app:itemTextColor="@color/nav_item_color" />
+        app:itemTextColor="@color/nav_item_color"
+        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>
