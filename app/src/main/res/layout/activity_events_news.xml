@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#4CAF50"
-        app:title="Tasheela Jayawickrama"
+        app:title="Events"
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/menu"
         app:menu="@menu/toolbar_menu" />

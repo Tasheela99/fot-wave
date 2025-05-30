@@ -15,6 +15,9 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
 
@@ -73,6 +76,10 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             popupMenu.getMenuInflater().inflate(R.menu.top_dropdown_menu, popupMenu.getMenu());
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null || !"tasheelajay1999@gmail.com".equals(user.getEmail())) {
+                popupMenu.getMenu().removeItem(R.id.menu_add_news);
+            }
 
             // Set rounded background to the internal ListView of the PopupMenu
             popupMenu.setOnDismissListener(menu -> Log.d(TAG, "Popup menu dismissed"));
@@ -87,16 +94,22 @@ public class BaseActivity extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 } else if (id == R.id.menu_dev_info) {
-                    Toast.makeText(this, "Developer Information", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, DeveloperInfoActivity.class);
+                    startActivity(intent);
                     return true;
                 } else if (id == R.id.menu_add_news) {
                     Intent intent = new Intent(this, AddNewsActivity.class);
                     startActivity(intent);
                     return true;
                 } else if (id == R.id.menu_logout) {
+                    FirebaseAuth.getInstance().signOut();
                     Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                     return true;
                 }
+
                 return false;
             });
 

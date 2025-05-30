@@ -1,38 +1,42 @@
 package com.assignment.fotwavenewsapp;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class UserInfoActivity extends AppCompatActivity {
+public class UserInfoActivity extends BaseActivity {
     private static final String TAG = "UserInfoActivity";
     private static final String PREFS_NAME = "UserPrefs";
     private static final String KEY_USERNAME = "username";
     private static final String KEY_EMAIL = "email";
 
     private TextView tvUsername, tvEmail;
-    private ImageView ivAvatar;
     private Button btnUpdateInfo;
+    private MaterialToolbar toolbar;
+    private BottomNavigationView bottomNavigation;
     private SharedPreferences sharedPreferences;
 
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private FirebaseFirestore firestore;
     private String userId;
 
     @Override
@@ -42,9 +46,10 @@ public class UserInfoActivity extends AppCompatActivity {
 
         initViews();
         setupToolbar();
+        setupBottomNavigation();
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        firestore = FirebaseFirestore.getInstance();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
@@ -58,42 +63,59 @@ public class UserInfoActivity extends AppCompatActivity {
     private void initViews() {
         tvUsername = findViewById(R.id.tv_username);
         tvEmail = findViewById(R.id.tv_email);
-        ivAvatar = findViewById(R.id.iv_avatar);
         btnUpdateInfo = findViewById(R.id.btn_update_info);
+        toolbar = findViewById(R.id.dropdown_anchor);
+        bottomNavigation = findViewById(R.id.bottom_navigation);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     }
 
     private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("User Information");
+            getSupportActionBar().setTitle("Tasheela Jayawickrama");
         }
 
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
+    private void setupBottomNavigation() {
+        bottomNavigation.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_academic) {
+                    startActivity(new Intent(UserInfoActivity.this, AcademicNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.nav_events) {
+                    startActivity(new Intent(UserInfoActivity.this, EventsNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.nav_sports) {
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
     private void loadUserDataFromFirebase(String uid) {
-        db.collection("users").document(uid)
+        firestore.collection("users").document(uid)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String username = documentSnapshot.getString("username");
                         String email = documentSnapshot.getString("email");
-
-                        // Save to SharedPreferences
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(KEY_USERNAME, username != null ? username : "Guest User");
                         editor.putString(KEY_EMAIL, email != null ? email : "guest@example.com");
                         editor.apply();
-
-                        // Update UI
                         tvUsername.setText(username != null ? username : "Guest User");
                         tvEmail.setText(email != null ? email : "guest@example.com");
-                        ivAvatar.setImageResource(R.drawable.ic_user_avatar);
 
                         Log.d(TAG, "User data fetched from Firebase: " + username + ", " + email);
                     } else {
@@ -138,14 +160,10 @@ public class UserInfoActivity extends AppCompatActivity {
             }
 
             tilUsername.setError(null);
-
-            // Save to SharedPreferences
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(KEY_USERNAME, newUsername);
             editor.apply();
-
-            // Update Firestore
-            db.collection("users").document(userId)
+            firestore.collection("users").document(userId)
                     .update("username", newUsername)
                     .addOnSuccessListener(aVoid -> {
                         tvUsername.setText(newUsername);

@@ -56,6 +56,10 @@
             android:exported="true"
              android:screenOrientation="portrait" />
         <activity
+            android:name=".DeveloperInfoActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".UserInfoActivity"
             android:label="User Information"
             android:parentActivityName=".MainActivity"

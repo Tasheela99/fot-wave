@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    >
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
@@ -12,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#4CAF50"
-        app:title="Tasheela Jayawickrama"
+        app:title="Academic"
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/menu"
         app:menu="@menu/toolbar_menu" />

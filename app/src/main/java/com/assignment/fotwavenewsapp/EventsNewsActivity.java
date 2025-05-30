@@ -1,6 +1,8 @@
 package com.assignment.fotwavenewsapp;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,10 +16,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.assignment.fotwavenewsapp.model.News;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
@@ -170,39 +175,78 @@ public class EventsNewsActivity extends BaseActivity {
         TextView contentTextView = createTextView(news.getContent(), 14, false, 0xFF800080);
         TextView dateTextView = createTextView(news.getDate(), 12, false, 0xFF666666);
         TextView descriptionTextView = createTextView(news.getDescription(), 14, false, 0xFF333333);
-        Button readButton = new Button(this);
+
+        MaterialButton readButton = new MaterialButton(this);
+        MaterialButton deleteButton = new MaterialButton(this);
+
+        LinearLayout buttonLayout = new LinearLayout(this);
+        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+        buttonLayout.setPadding(0, dpToPx(12), 0, 0);
+
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        buttonParams.setMargins(0, dpToPx(12), 0, 0);
+        buttonParams.setMargins(dpToPx(8), 0, dpToPx(8), 0);
+
         readButton.setLayoutParams(buttonParams);
         readButton.setText("Read News");
-        readButton.setBackgroundTintList(getColorStateList(android.R.color.holo_green_light));
-        readButton.setTextColor(getColor(android.R.color.white));
-
-        // Add click listener for the button
+        readButton.setCornerRadius(dpToPx(16));
+        readButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#4CAF50")));
+        readButton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+        readButton.setIconPadding(dpToPx(8));
         readButton.setOnClickListener(v -> {
-            // Create intent to open NewsDetailActivity
             Intent intent = new Intent(EventsNewsActivity.this, NewsDetailActivity.class);
-
-            // Pass news data to the new activity
             intent.putExtra("news_title", news.getTitle());
             intent.putExtra("news_content", news.getContent());
             intent.putExtra("news_description", news.getDescription());
             intent.putExtra("news_date", news.getDate());
             intent.putExtra("news_image_url", news.getImageUrl());
-
-            // Start the new activity
             startActivity(intent);
         });
 
-        // Add views to content layout
+
+        buttonLayout.addView(readButton);
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            String loggedInUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            if ("tasheelajay1999@gmail.com".equalsIgnoreCase(loggedInUserEmail)) {
+                deleteButton.setLayoutParams(buttonParams);
+                deleteButton.setText("Delete News");
+                deleteButton.setCornerRadius(dpToPx(16));
+                deleteButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#F44336")));
+                deleteButton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+                deleteButton.setIconPadding(dpToPx(8));
+
+                deleteButton.setOnClickListener(v -> {
+                    db.collection("news")
+                            .whereEqualTo("title", news.getTitle())
+                            .whereEqualTo("date", news.getDate())
+                            .get()
+                            .addOnSuccessListener(queryDocumentSnapshots -> {
+                                for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
+                                    snapshot.getReference().delete()
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(this, "News deleted", Toast.LENGTH_SHORT).show();
+                                                fetchEventsNews(); // Refresh news
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show();
+                                            });
+                                }
+                            });
+                });
+
+                buttonLayout.addView(deleteButton);
+            }
+        }
+
         contentLayout.addView(titleTextView);
         contentLayout.addView(contentTextView);
         contentLayout.addView(dateTextView);
         contentLayout.addView(descriptionTextView);
-        contentLayout.addView(readButton);
+        contentLayout.addView(buttonLayout);
 
         // Add views to main layout
         mainLayout.addView(imageView);
