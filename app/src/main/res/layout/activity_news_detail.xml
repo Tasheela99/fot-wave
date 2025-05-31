@@ -10,12 +10,11 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="15dp"
         android:background="#4CAF50"
-        app:menu="@menu/toolbar_menu"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
         app:navigationIcon="@drawable/menu"
-        app:title="News Details"
         app:titleTextColor="@android:color/white" />
+
 
     <!-- Scrollable content -->
     <ScrollView
@@ -38,7 +37,7 @@
                 android:layout_height="250dp"
                 android:scaleType="centerCrop"
                 android:contentDescription="News Image"
-                android:background="#F0F0F0" />
+                android:background="#FFFFFF" />
 
             <!-- Content Container -->
             <LinearLayout
@@ -46,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp"
-                android:background="#FDF0F6">
+                android:background="#FFFFFF">
 
                 <!-- News Title -->
                 <TextView
@@ -58,7 +57,8 @@
                     android:textStyle="bold"
                     android:textColor="#000000"
                     android:lineSpacingExtra="4dp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/play_bold" />
 
                 <!-- News Date -->
                 <TextView
@@ -68,32 +68,8 @@
                     android:text="Date"
                     android:textSize="12sp"
                     android:textColor="#666666"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- News Content -->
-                <TextView
-                    android:id="@+id/news_detail_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="News Content"
-                    android:textSize="16sp"
-                    android:textColor="#800080"
-                    android:lineSpacingExtra="6dp"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- Another Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="16dp"
+                    android:fontFamily="@font/play_regular" />
 
                 <!-- News Description -->
                 <TextView
@@ -104,7 +80,23 @@
                     android:textSize="14sp"
                     android:textColor="#333333"
                     android:lineSpacingExtra="4dp"
-                    android:layout_marginBottom="32dp" />
+                    android:layout_marginBottom="32dp"
+                    android:fontFamily="@font/play_regular"
+                    android:justificationMode="inter_word" />
+
+
+                <!-- Back Button - Fixed attributes -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="16dp"
+                    android:backgroundTint="#1AC428"
+                    android:text="Back To Home"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/play_regular"
+                    app:cornerRadius="24dp" />
 
             </LinearLayout>
         </LinearLayout>

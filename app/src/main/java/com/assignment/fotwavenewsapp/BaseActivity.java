@@ -1,71 +1,74 @@
 package com.assignment.fotwavenewsapp;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowManager;
+import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.widget.ListView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
+    protected MaterialToolbar toolbar;
+    private Window window;
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        Log.d(TAG, "Options menu created");
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(TAG, "Menu item selected: " + item.getItemId());
-
-        if (item.getItemId() == R.id.dropdown) {
-            Log.d(TAG, "Dropdown menu item clicked");
-
-            // Try multiple ways to find the anchor view
-            View anchorView = findViewById(R.id.dropdown_anchor);
-            if (anchorView == null) {
-                // If dropdown_anchor not found, try using the toolbar itself
-                anchorView = getSupportActionBar() != null ?
-                        findViewById(android.R.id.home) :
-                        findViewById(R.id.dropdown_anchor);
-                Log.d(TAG, "Primary anchor not found, using alternative");
-            }
-
-            if (anchorView != null) {
-                Log.d(TAG, "Anchor view found, showing popup");
-                showPopupMenu(anchorView);
-            } else {
-                Log.e(TAG, "No suitable anchor view found");
-                // Use the toolbar as fallback
-                View toolbar = findViewById(R.id.dropdown_anchor);
-                if (toolbar == null) {
-                    // Create a temporary view if nothing else works
-                    View tempView = new View(this);
-                    showPopupMenu(tempView);
-                } else {
-                    showPopupMenu(toolbar);
-                }
-            }
-            return true;
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        configureStatusBar();
+        if (Build.VERSION.SDK_INT >= 21) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(this.getResources().getColor(R.color.success_color));
         }
-        return super.onOptionsItemSelected(item);
+
+        int color = ContextCompat.getColor(this, R.color.success_color); // Replace with your color
+        setStatusBarColorWithInsets(this, color);
+
     }
 
 
+    public void setStatusBarColorWithInsets(Activity activity, int color) {
+        Window window = activity.getWindow();
+        View decorView = window.getDecorView();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // API 34+
+            decorView.setOnApplyWindowInsetsListener((v, insets) -> {
+                android.graphics.Insets statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars());
+                v.setBackgroundColor(color);
+
+                // Adjust padding to prevent overlap
+                v.setPadding(0, statusBarInsets.top, 0, 0);
+
+                return insets;
+            });
+        } else {
+            // For Android 14 and below
+            window.setStatusBarColor(color);
+        }
+    }
     protected void showPopupMenu(View anchor) {
         try {
             Log.d(TAG, "Creating popup menu");
@@ -145,4 +148,80 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    protected void setupToolbarWithUsername() {
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false); // Hide default title
+        }
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            String uid = firebaseUser.getUid();
+            FirebaseFirestore.getInstance().collection("users").document(uid)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        String username = documentSnapshot.getString("username");
+                        if (username == null || username.isEmpty()) {
+                            username = firebaseUser.getEmail().split("@")[0];
+                        }
+                        addRightAlignedUsername(username);
+                    })
+                    .addOnFailureListener(e -> addRightAlignedUsername("User"));
+        } else {
+            addRightAlignedUsername("User");
+        }
+
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
+    private void addRightAlignedUsername(String username) {
+        TextView textView = new TextView(this);
+        textView.setText(username + " \u25BE"); // Unicode down arrow ▼
+        textView.setTextColor(Color.WHITE);
+        textView.setTextSize(18);
+        textView.setTypeface(null, Typeface.BOLD);
+
+        androidx.appcompat.widget.Toolbar.LayoutParams layoutParams =
+                new androidx.appcompat.widget.Toolbar.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+        layoutParams.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+
+        textView.setLayoutParams(layoutParams);
+        textView.setPadding(0, 0, 24, 0);
+        textView.setOnClickListener(v -> showPopupMenu(v));
+
+        toolbar.addView(textView);
+    }
+
+    public void setStatusBarColor(Activity activity, int colorResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = activity.getWindow();
+            window.setStatusBarColor(ContextCompat.getColor(activity, colorResId));
+        }
+    }
+    public void configureStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Method 1: Use your existing setStatusBarColor method
+            try {
+                setStatusBarColor(this, R.color.success_color);
+            } catch (Exception e) {
+                try {
+                    setStatusBarColor(this, R.color.primary_color);
+                } catch (Exception e2) {
+                    getWindow().setStatusBarColor(Color.parseColor("#4CAF50")); // Green color
+                }
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                View decorView = getWindow().getDecorView();
+                decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            }
+
+            Log.d(TAG, "Status bar color configured successfully");
+        }
+    }
 }

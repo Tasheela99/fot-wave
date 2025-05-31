@@ -60,11 +60,12 @@ public class AddNewsActivity extends BaseActivity {
         setContentView(R.layout.activity_add_news);
 
         initializeViews();
-        setupToolbar();
         setupBottomNavigation();
         setupFirebase();
         setupSpinner();
         setupClickListeners();
+
+        setupToolbarWithUsername();
     }
 
     private void initializeViews() {
@@ -80,7 +81,7 @@ public class AddNewsActivity extends BaseActivity {
     }
 
     private void setupToolbar() {
-        MaterialToolbar toolbar = findViewById(R.id.dropdown_anchor);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

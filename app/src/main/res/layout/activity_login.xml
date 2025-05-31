@@ -1,65 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1AC428">
 
+    <!-- Green Header Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingTop="40dp"
+        android:paddingBottom="40dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp">
 
-        <!-- Green Header Section -->
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="332dp"
+            android:layout_height="190dp"
+            android:contentDescription="App Logo"
+            android:src="@drawable/logo_white" />
+    </LinearLayout>
+
+    <!-- White Card Area Filling Remaining Screen -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/card_top_rounded_only"
+        android:fillViewport="true">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="40dp"
-            android:paddingBottom="40dp"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp">
-
-            <!-- Logo -->
-            <ImageView
-                android:id="@+id/logoImage"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:contentDescription="App Logo"
-                android:src="@drawable/app_logo" />
-
-            <TextView
-                android:id="@+id/appTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:letterSpacing="0.1"
-                android:text="FOT WAVE"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tagline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Ride the Innovation"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <!-- White Card with Top Rounded Corners Only -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="924dp"
-            android:background="@drawable/card_top_rounded_only"
-            android:orientation="vertical"
+            android:fontFamily="@font/play_regular"
             android:padding="24dp">
 
-            <!-- Welcome Text -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -67,18 +47,21 @@
                 android:layout_marginBottom="8dp"
                 android:text="Welcome Back!"
                 android:textColor="#000000"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/play_bold"
+                />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginBottom="24dp"
                 android:text="Stay in the loop with the latest academic events,\nsports highlights, and everything happening on campus."
                 android:textAlignment="center"
                 android:textColor="#555555"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:fontFamily="@font/play_regular"
+                />
 
             <!-- Username Field -->
             <com.google.android.material.textfield.TextInputLayout
@@ -89,13 +72,16 @@
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp">
+                app:boxCornerRadiusTopStart="12dp"
+                android:fontFamily="@font/play_regular"
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="User Name"
+                    android:fontFamily="@font/play_regular"
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,6 +94,7 @@
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
+                android:fontFamily="@font/play_regular"
                 app:boxCornerRadiusTopStart="12dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -115,6 +102,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Password"
+                    android:fontFamily="@font/play_regular"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -127,21 +115,26 @@
                 android:backgroundTint="#1AC428"
                 android:text="Login Now"
                 android:textColor="#FFFFFF"
-                app:cornerRadius="24dp" />
+                app:cornerRadius="24dp"
+                android:fontFamily="@font/play_regular"
+                />
 
             <!-- Register Link -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Don't have an account? "
                     android:textColor="#000000"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/play_regular"
+                    />
 
                 <TextView
                     android:id="@+id/registerNow"
@@ -149,11 +142,11 @@
                     android:layout_height="wrap_content"
                     android:text="register now"
                     android:textColor="#1AC428"
+                    android:fontFamily="@font/play_regular"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
-
         </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

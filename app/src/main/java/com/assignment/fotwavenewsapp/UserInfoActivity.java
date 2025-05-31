@@ -45,8 +45,8 @@ public class UserInfoActivity extends BaseActivity {
         setContentView(R.layout.activity_user_info);
 
         initViews();
-        setupToolbar();
         setupBottomNavigation();
+        setupToolbarWithUsername();
 
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
@@ -64,7 +64,7 @@ public class UserInfoActivity extends BaseActivity {
         tvUsername = findViewById(R.id.tv_username);
         tvEmail = findViewById(R.id.tv_email);
         btnUpdateInfo = findViewById(R.id.btn_update_info);
-        toolbar = findViewById(R.id.dropdown_anchor);
+        toolbar = findViewById(R.id.toolbar);
         bottomNavigation = findViewById(R.id.bottom_navigation);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -73,13 +73,48 @@ public class UserInfoActivity extends BaseActivity {
     private void setupToolbar() {
         setSupportActionBar(toolbar);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Tasheela Jayawickrama");
-        }
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        if (firebaseUser != null) {
+            String uid = firebaseUser.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            db.collection("users").document(uid).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        String username = "User";
+                        if (documentSnapshot.exists()) {
+                            username = documentSnapshot.getString("username");
+                            if (username == null || username.isEmpty()) {
+                                username = firebaseUser.getEmail().split("@")[0];
+                            }
+                        }
+
+                        if (getSupportActionBar() != null) {
+                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                            getSupportActionBar().setTitle(username);
+                        }
+
+                        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+                    })
+                    .addOnFailureListener(e -> {
+                        if (getSupportActionBar() != null) {
+                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                            getSupportActionBar().setTitle("User");
+                        }
+
+                        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+                    });
+
+        } else {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle("User");
+            }
+
+            toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        }
     }
+
 
     private void setupBottomNavigation() {
         bottomNavigation.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {

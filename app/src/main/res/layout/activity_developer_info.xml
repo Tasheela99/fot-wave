@@ -8,15 +8,14 @@
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/dropdown_anchor"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#4CAF50"
-        android:paddingTop="15dp"
-        app:menu="@menu/toolbar_menu"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
         app:navigationIcon="@drawable/menu"
-        app:title="Developer Info"
         app:titleTextColor="@android:color/white" />
+
 
     <!-- Main Content -->
     <ScrollView

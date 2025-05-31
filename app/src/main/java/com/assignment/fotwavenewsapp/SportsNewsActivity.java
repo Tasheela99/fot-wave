@@ -3,8 +3,13 @@ package com.assignment.fotwavenewsapp;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.assignment.fotwavenewsapp.model.News;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -46,13 +52,15 @@ public class SportsNewsActivity extends BaseActivity {
         setupBottomNavigation();
         setupFirestore();
         fetchSportsNews();
+
+        setupToolbarWithUsername();
     }
 
     private void initializeViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_sports);
 
-        MaterialToolbar toolbar = findViewById(R.id.dropdown_anchor);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Find the LinearLayout inside ScrollView where cards will be added
@@ -92,7 +100,7 @@ public class SportsNewsActivity extends BaseActivity {
 
     private void fetchSportsNews() {
         db.collection("news")
-                .whereEqualTo("newsType", "Sports")
+                .whereEqualTo("newsType", "sports")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -133,18 +141,20 @@ public class SportsNewsActivity extends BaseActivity {
     }
 
     private void createNewsCard(News news) {
-        // Create CardView programmatically
+        Typeface playRegular = ResourcesCompat.getFont(this, R.font.play_regular);
+        Typeface playBold = ResourcesCompat.getFont(this, R.font.play_bold);
+
         CardView cardView = new CardView(this);
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        cardParams.setMargins(0, 0, 0, dpToPx(16));
+        cardParams.setMargins(dpToPx(16), dpToPx(8), dpToPx(16), dpToPx(16));
         cardView.setLayoutParams(cardParams);
-        cardView.setCardElevation(dpToPx(4));
-        cardView.setRadius(dpToPx(12));
+        cardView.setCardElevation(dpToPx(8));
+        cardView.setRadius(dpToPx(16));
+        cardView.setCardBackgroundColor(Color.WHITE);
 
-        // Create main LinearLayout for card content
         LinearLayout mainLayout = new LinearLayout(this);
         mainLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -152,16 +162,34 @@ public class SportsNewsActivity extends BaseActivity {
         ));
         mainLayout.setOrientation(LinearLayout.VERTICAL);
 
-        // Create ImageView
+        // TOP TITLE (above image)
+        LinearLayout topTitleContainer = new LinearLayout(this);
+        topTitleContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        topTitleContainer.setPadding(dpToPx(20), dpToPx(16), dpToPx(20), dpToPx(8));
+        topTitleContainer.setBackgroundColor(Color.WHITE);
+
+        TextView topTitleTextView = new TextView(this);
+        topTitleTextView.setText(news.getTitle());
+        topTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        topTitleTextView.setTypeface(playBold);
+        topTitleTextView.setTextColor(Color.BLACK);
+        topTitleTextView.setMaxLines(2);
+        topTitleTextView.setEllipsize(TextUtils.TruncateAt.END);
+
+        topTitleContainer.addView(topTitleTextView);
+
+        // Image View
         ImageView imageView = new ImageView(this);
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                dpToPx(200)
+                dpToPx(180)
         );
         imageView.setLayoutParams(imageParams);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        // Load image using Picasso (you might need to add Picasso dependency)
         if (news.getImageUrl() != null && !news.getImageUrl().isEmpty()) {
             Picasso.get()
                     .load(news.getImageUrl())
@@ -172,7 +200,7 @@ public class SportsNewsActivity extends BaseActivity {
             imageView.setImageResource(R.drawable.ic_launcher_foreground);
         }
 
-        // Create content LinearLayout
+        // Content Layout
         LinearLayout contentLayout = new LinearLayout(this);
         LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -180,35 +208,80 @@ public class SportsNewsActivity extends BaseActivity {
         );
         contentLayout.setLayoutParams(contentParams);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
-        contentLayout.setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16));
-        contentLayout.setBackgroundColor(0xFFFDF0F6); // #FDF0F6
+        contentLayout.setPadding(dpToPx(20), dpToPx(16), dpToPx(20), dpToPx(20));
+        contentLayout.setBackgroundColor(Color.WHITE);
 
-        // Create TextViews
-        TextView titleTextView = createTextView(news.getTitle(), 16, true, 0xFF000000);
-        TextView contentTextView = createTextView(news.getContent(), 14, false, 0xFF800080);
-        TextView dateTextView = createTextView(news.getDate(), 12, false, 0xFF666666);
-        TextView descriptionTextView = createTextView(news.getDescription(), 14, false, 0xFF333333);
-
-
-        MaterialButton readButton = new MaterialButton(this);
-        MaterialButton deleteButton = new MaterialButton(this);
-
-        LinearLayout buttonLayout = new LinearLayout(this);
-        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
-        buttonLayout.setPadding(0, dpToPx(12), 0, 0);
-
-        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+        // SECOND TITLE (below image, underlined)
+        TextView titleBelowTextView = new TextView(this);
+        titleBelowTextView.setText(news.getTitle());
+        titleBelowTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        titleBelowTextView.setTypeface(playRegular);
+        titleBelowTextView.setTextColor(Color.BLACK);
+        titleBelowTextView.setMaxLines(2);
+        titleBelowTextView.setEllipsize(TextUtils.TruncateAt.END);
+        titleBelowTextView.setPaintFlags(titleBelowTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        LinearLayout.LayoutParams titleBelowParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        buttonParams.setMargins(dpToPx(8), 0, dpToPx(8), 0);
+        titleBelowParams.setMargins(0, 0, 0, dpToPx(8));
+        titleBelowTextView.setLayoutParams(titleBelowParams);
 
-        readButton.setLayoutParams(buttonParams);
+        // Date TextView
+        TextView dateTextView = new TextView(this);
+        dateTextView.setText(news.getDate());
+        dateTextView.setTypeface(playRegular);
+        dateTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        dateTextView.setTextColor(Color.parseColor("#666666"));
+        LinearLayout.LayoutParams dateParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        dateParams.setMargins(0, 0, 0, dpToPx(12));
+        dateTextView.setLayoutParams(dateParams);
+
+        // Description TextView
+        TextView descriptionTextView = new TextView(this);
+        descriptionTextView.setText(news.getDescription());
+        descriptionTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        descriptionTextView.setTextColor(Color.parseColor("#333333"));
+        descriptionTextView.setMaxLines(3);
+        descriptionTextView.setTypeface(playRegular);
+        descriptionTextView.setEllipsize(TextUtils.TruncateAt.END);
+        descriptionTextView.setLineSpacing(dpToPx(2), 1.0f);
+        LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        descParams.setMargins(0, 0, 0, dpToPx(16));
+        descriptionTextView.setLayoutParams(descParams);
+
+        // Button Layout
+        LinearLayout buttonLayout = new LinearLayout(this);
+        buttonLayout.setGravity(Gravity.END);
+        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        buttonLayout.setLayoutParams(buttonLayoutParams);
+
+        // Read News Button
+        MaterialButton readButton = new MaterialButton(this);
+        LinearLayout.LayoutParams readButtonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                dpToPx(40)
+        );
+        readButtonParams.setMargins(0, 0, dpToPx(12), 0);
+        readButton.setLayoutParams(readButtonParams);
         readButton.setText("Read News");
-        readButton.setCornerRadius(dpToPx(16));
+        readButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        readButton.setCornerRadius(dpToPx(20));
         readButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#4CAF50")));
-        readButton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
-        readButton.setIconPadding(dpToPx(8));
+        readButton.setTextColor(Color.WHITE);
+        readButton.setPadding(dpToPx(16), 0, dpToPx(16), 0);
+        readButton.setAllCaps(false);
+        readButton.setTypeface(playRegular);
         readButton.setOnClickListener(v -> {
             Intent intent = new Intent(SportsNewsActivity.this, NewsDetailActivity.class);
             intent.putExtra("news_title", news.getTitle());
@@ -216,22 +289,31 @@ public class SportsNewsActivity extends BaseActivity {
             intent.putExtra("news_description", news.getDescription());
             intent.putExtra("news_date", news.getDate());
             intent.putExtra("news_image_url", news.getImageUrl());
+            intent.putExtra("source_activity", "sports");
             startActivity(intent);
         });
 
-
         buttonLayout.addView(readButton);
 
+        // Admin Delete Button (only for specific user)
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             String loggedInUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
             if ("tasheelajay1999@gmail.com".equalsIgnoreCase(loggedInUserEmail)) {
-                deleteButton.setLayoutParams(buttonParams);
+                MaterialButton deleteButton = new MaterialButton(this);
+                LinearLayout.LayoutParams deleteButtonParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        dpToPx(40)
+                );
+                deleteButton.setLayoutParams(deleteButtonParams);
                 deleteButton.setText("Delete News");
-                deleteButton.setCornerRadius(dpToPx(16));
+                deleteButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                deleteButton.setCornerRadius(dpToPx(20));
+                deleteButton.setTypeface(playRegular);
                 deleteButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#F44336")));
-                deleteButton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
-                deleteButton.setIconPadding(dpToPx(8));
+                deleteButton.setTextColor(Color.WHITE);
+                deleteButton.setPadding(dpToPx(16), 0, dpToPx(16), 0);
+                deleteButton.setAllCaps(false);
 
                 deleteButton.setOnClickListener(v -> {
                     db.collection("news")
@@ -243,7 +325,7 @@ public class SportsNewsActivity extends BaseActivity {
                                     snapshot.getReference().delete()
                                             .addOnSuccessListener(aVoid -> {
                                                 Toast.makeText(this, "News deleted", Toast.LENGTH_SHORT).show();
-                                                fetchSportsNews(); // Refresh news
+                                                fetchSportsNews();
                                             })
                                             .addOnFailureListener(e -> {
                                                 Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show();
@@ -256,35 +338,21 @@ public class SportsNewsActivity extends BaseActivity {
             }
         }
 
-        contentLayout.addView(titleTextView);
-        contentLayout.addView(contentTextView);
+        // Add all views to content layout
+        contentLayout.addView(titleBelowTextView); // Second title (underlined)
         contentLayout.addView(dateTextView);
         contentLayout.addView(descriptionTextView);
         contentLayout.addView(buttonLayout);
 
-        mainLayout.addView(imageView);
-        mainLayout.addView(contentLayout);
+        // Add to main layout IN CORRECT ORDER
+        mainLayout.addView(topTitleContainer); // FIRST: Top title
+        mainLayout.addView(imageView);         // SECOND: Image
+        mainLayout.addView(contentLayout);     // THIRD: Content with second title, date, description, button
 
         cardView.addView(mainLayout);
         newsContainer.addView(cardView);
     }
 
-    private TextView createTextView(String text, int textSize, boolean bold, int color) {
-        TextView textView = new TextView(this);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, dpToPx(4), 0, 0);
-        textView.setLayoutParams(params);
-        textView.setText(text != null ? text : "");
-        textView.setTextSize(textSize);
-        textView.setTextColor(color);
-        if (bold) {
-            textView.setTypeface(null, android.graphics.Typeface.BOLD);
-        }
-        return textView;
-    }
 
     private void showNoNewsMessage() {
         TextView noNewsText = new TextView(this);
@@ -302,7 +370,6 @@ public class SportsNewsActivity extends BaseActivity {
     }
 
     private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
+        return (int) (dp * getResources().getDisplayMetrics().density);
     }
 }

@@ -22,12 +22,13 @@ public class DeveloperInfoActivity extends BaseActivity {
         setContentView(R.layout.activity_developer_info);
 
         initViews();
-        setupToolbar();
         setupBottomNavigation();
+
+        setupToolbarWithUsername();
     }
 
     private void initViews() {
-        toolbar = findViewById(R.id.dropdown_anchor);
+        toolbar = findViewById(R.id.toolbar);
         bottomNavigation = findViewById(R.id.bottom_navigation);
     }
 
