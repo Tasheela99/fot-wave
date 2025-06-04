@@ -131,6 +131,8 @@ public class UserInfoActivity extends BaseActivity {
                     overridePendingTransition(0, 0);
                     return true;
                 } else if (itemId == R.id.nav_sports) {
+                    startActivity(new Intent(UserInfoActivity.this, SportsNewsActivity.class));
+                    overridePendingTransition(0, 0);
                     return true;
                 }
                 return false;

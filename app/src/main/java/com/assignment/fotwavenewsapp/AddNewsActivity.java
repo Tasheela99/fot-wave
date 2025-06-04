@@ -80,14 +80,6 @@ public class AddNewsActivity extends BaseActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
     }
 
-    private void setupToolbar() {
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
     private void setupBottomNavigation() {
         // Don't set any item as selected for AddNews activity
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {

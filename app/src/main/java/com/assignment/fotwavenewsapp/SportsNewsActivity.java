@@ -299,7 +299,7 @@ public class SportsNewsActivity extends BaseActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             String loggedInUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-            if ("tasheelajay1999@gmail.com".equalsIgnoreCase(loggedInUserEmail)) {
+            if ("admin@gmail.com".equalsIgnoreCase(loggedInUserEmail)) {
                 MaterialButton deleteButton = new MaterialButton(this);
                 LinearLayout.LayoutParams deleteButtonParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,

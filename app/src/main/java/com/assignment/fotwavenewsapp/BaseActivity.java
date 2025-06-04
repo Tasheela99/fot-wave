@@ -80,7 +80,7 @@ public class BaseActivity extends AppCompatActivity {
 
             popupMenu.getMenuInflater().inflate(R.menu.top_dropdown_menu, popupMenu.getMenu());
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user == null || !"tasheelajay1999@gmail.com".equals(user.getEmail())) {
+            if (user == null || !"admin@gmail.com".equals(user.getEmail())) {
                 popupMenu.getMenu().removeItem(R.id.menu_add_news);
             }
 

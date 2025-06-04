@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,34 +37,29 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventsNewsActivity extends BaseActivity {
-    private static final String TAG = "EventsNewsActivity";
+public class HomeActivity extends BaseActivity {
+    private static final String TAG = "HomeActivity";
     private BottomNavigationView bottomNavigationView;
     private LinearLayout newsContainer;
     private FirebaseFirestore db;
-    private List<News> eventsList;
+    private List<News> academicList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_events_news);
-
+        setContentView(R.layout.activity_home);
         initializeViews();
         setupBottomNavigation();
         setupFirestore();
-        fetchEventsNews();
-
+        fetchAcademicNews();
+        configureStatusBar();
         setupToolbarWithUsername();
     }
 
     private void initializeViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.nav_events);
-
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Find the LinearLayout inside ScrollView where cards will be added
         newsContainer = findViewById(R.id.news_container);
         if (newsContainer == null) {
             Log.e(TAG, "news_container not found in layout");
@@ -77,17 +73,18 @@ public class EventsNewsActivity extends BaseActivity {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.nav_sports) {
-                    startActivity(new Intent(EventsNewsActivity.this, SportsNewsActivity.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-                } else if (itemId == R.id.nav_academic) {
-                    startActivity(new Intent(EventsNewsActivity.this, AcademicNewsActivity.class));
+                    startActivity(new Intent(HomeActivity.this, SportsNewsActivity.class));
                     overridePendingTransition(0, 0);
                     return true;
                 } else if (itemId == R.id.nav_events) {
+                    startActivity(new Intent(HomeActivity.this, EventsNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.nav_academic) {
+                    startActivity(new Intent(HomeActivity.this, AcademicNewsActivity.class));
+                    overridePendingTransition(0, 0);
                     return true;
                 }
-
                 return false;
             }
         });
@@ -95,30 +92,29 @@ public class EventsNewsActivity extends BaseActivity {
 
     private void setupFirestore() {
         db = FirebaseFirestore.getInstance();
-        eventsList = new ArrayList<>();
+        academicList = new ArrayList<>();
     }
 
-    private void fetchEventsNews() {
+    private void fetchAcademicNews() {
         db.collection("news")
-                .whereEqualTo("newsType", "events")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        eventsList.clear();
+                        academicList.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             News news = document.toObject(News.class);
-                            eventsList.add(news);
+                            academicList.add(news);
                             Log.d(TAG, "News fetched: " + news.getTitle());
                         }
                         displayNews();
                     } else {
                         Log.w(TAG, "Error getting documents.", task.getException());
-                        Toast.makeText(EventsNewsActivity.this, "Failed to fetch news", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, "Failed to fetch news", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error fetching events news", e);
-                    Toast.makeText(EventsNewsActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error fetching academic news", e);
+                    Toast.makeText(HomeActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -127,11 +123,15 @@ public class EventsNewsActivity extends BaseActivity {
             Log.e(TAG, "newsContainer is null, cannot display news");
             return;
         }
+
+        // Clear existing views except the first example card (optional)
         newsContainer.removeAllViews();
-        for (News news : eventsList) {
+
+        for (News news : academicList) {
             createNewsCard(news);
         }
-        if (eventsList.isEmpty()) {
+
+        if (academicList.isEmpty()) {
             showNoNewsMessage();
         }
     }
@@ -279,13 +279,13 @@ public class EventsNewsActivity extends BaseActivity {
         readButton.setAllCaps(false);
         readButton.setTypeface(playRegular);
         readButton.setOnClickListener(v -> {
-            Intent intent = new Intent(EventsNewsActivity.this, NewsDetailActivity.class);
+            Intent intent = new Intent(HomeActivity.this, NewsDetailActivity.class);
             intent.putExtra("news_title", news.getTitle());
             intent.putExtra("news_content", news.getContent());
             intent.putExtra("news_description", news.getDescription());
             intent.putExtra("news_date", news.getDate());
             intent.putExtra("news_image_url", news.getImageUrl());
-            intent.putExtra("source_activity", "events");
+            intent.putExtra("source_activity", "academic");
             startActivity(intent);
         });
 
@@ -321,7 +321,7 @@ public class EventsNewsActivity extends BaseActivity {
                                     snapshot.getReference().delete()
                                             .addOnSuccessListener(aVoid -> {
                                                 Toast.makeText(this, "News deleted", Toast.LENGTH_SHORT).show();
-                                                fetchEventsNews();
+                                                fetchAcademicNews();
                                             })
                                             .addOnFailureListener(e -> {
                                                 Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show();
@@ -349,23 +349,6 @@ public class EventsNewsActivity extends BaseActivity {
         newsContainer.addView(cardView);
     }
 
-    private TextView createTextView(String text, int textSize, boolean bold, int color) {
-        TextView textView = new TextView(this);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, dpToPx(4), 0, 0);
-        textView.setLayoutParams(params);
-        textView.setText(text != null ? text : "");
-        textView.setTextSize(textSize);
-        textView.setTextColor(color);
-        if (bold) {
-            textView.setTypeface(null, android.graphics.Typeface.BOLD);
-        }
-        return textView;
-    }
-
     private void showNoNewsMessage() {
         TextView noNewsText = new TextView(this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -374,7 +357,7 @@ public class EventsNewsActivity extends BaseActivity {
         );
         params.setMargins(0, dpToPx(32), 0, 0);
         noNewsText.setLayoutParams(params);
-        noNewsText.setText("No Events news available at the moment.");
+        noNewsText.setText("No academic news available at the moment.");
         noNewsText.setTextSize(16);
         noNewsText.setTextColor(0xFF666666);
         noNewsText.setGravity(android.view.Gravity.CENTER);
