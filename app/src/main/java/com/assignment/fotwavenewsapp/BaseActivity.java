@@ -1,12 +1,14 @@
 package com.assignment.fotwavenewsapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,9 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 
 public class BaseActivity extends AppCompatActivity {
@@ -72,27 +77,28 @@ public class BaseActivity extends AppCompatActivity {
     protected void showPopupMenu(View anchor) {
         try {
             Log.d(TAG, "Creating popup menu");
-            PopupMenu popupMenu = new PopupMenu(this, anchor);
+
+            // Create PopupMenu with custom theme
+            Context wrapper = new ContextThemeWrapper(this, R.style.CustomPopupMenu);
+            PopupMenu popupMenu = new PopupMenu(wrapper, anchor);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 popupMenu.setGravity(Gravity.END);
             }
 
             popupMenu.getMenuInflater().inflate(R.menu.top_dropdown_menu, popupMenu.getMenu());
+
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user == null || !"admin@gmail.com".equals(user.getEmail())) {
                 popupMenu.getMenu().removeItem(R.id.menu_add_news);
             }
 
-            // Set rounded background to the internal ListView of the PopupMenu
-            popupMenu.setOnDismissListener(menu -> Log.d(TAG, "Popup menu dismissed"));
-
             popupMenu.setOnMenuItemClickListener(item -> {
+                // Your existing click handling code
                 int id = item.getItemId();
                 Log.d(TAG, "Popup menu item clicked: " + id);
 
                 if (id == R.id.menu_user_info) {
-                    // Open UserInfoActivity instead of showing toast
                     Intent intent = new Intent(this, UserInfoActivity.class);
                     startActivity(intent);
                     return true;
@@ -116,37 +122,15 @@ public class BaseActivity extends AppCompatActivity {
                 return false;
             });
 
-            // Show the popup first, so the internal ListView can be accessed
+            popupMenu.setOnDismissListener(menu -> Log.d(TAG, "Popup menu dismissed"));
             popupMenu.show();
-
-            // Access the popup's ListView and set custom background
-            // Warning: This uses reflection and internal API, which might break in future Android versions
-            try {
-                java.lang.reflect.Field mPopupField = popupMenu.getClass().getDeclaredField("mPopup");
-                mPopupField.setAccessible(true);
-                Object mPopup = mPopupField.get(popupMenu);
-
-                if (mPopup != null) {
-                    java.lang.reflect.Method getListViewMethod = mPopup.getClass().getDeclaredMethod("getListView");
-                    getListViewMethod.setAccessible(true);
-                    ListView listView = (ListView) getListViewMethod.invoke(mPopup);
-
-                    if (listView != null) {
-                        Drawable bg = getResources().getDrawable(R.drawable.popup_menu_background);
-                        listView.setBackground(bg);
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to set popup menu background with rounded corners", e);
-            }
-
-            Log.d(TAG, "Popup menu shown successfully");
 
         } catch (Exception e) {
             Log.e(TAG, "Error showing popup menu", e);
             Toast.makeText(this, "Error showing menu: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
 
     protected void setupToolbarWithUsername() {
         toolbar = findViewById(R.id.toolbar);

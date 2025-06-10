@@ -7,5 +7,10 @@
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
     </style>
 
+    <style name="CustomPopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/popup_menu_background</item>
+        <item name="android:popupElevation">8dp</item>
+    </style>
+
     <style name="Theme.FotWaveNewsApp" parent="Base.Theme.FotWaveNewsApp" />
 </resources>
