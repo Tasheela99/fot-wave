@@ -148,7 +148,7 @@ public class AcademicNewsActivity extends BaseActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        cardParams.setMargins(dpToPx(16), dpToPx(8), dpToPx(16), dpToPx(16));
+        cardParams.setMargins(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
         cardView.setLayoutParams(cardParams);
         cardView.setCardElevation(dpToPx(8));
         cardView.setRadius(dpToPx(16));
@@ -167,7 +167,7 @@ public class AcademicNewsActivity extends BaseActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
-        topTitleContainer.setPadding(dpToPx(20), dpToPx(16), dpToPx(20), dpToPx(8));
+        topTitleContainer.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
         topTitleContainer.setBackgroundColor(Color.WHITE);
 
         TextView topTitleTextView = new TextView(this);

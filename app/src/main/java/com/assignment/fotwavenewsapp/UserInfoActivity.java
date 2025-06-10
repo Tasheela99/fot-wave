@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,6 +35,8 @@ public class UserInfoActivity extends BaseActivity {
     private MaterialToolbar toolbar;
     private BottomNavigationView bottomNavigation;
     private SharedPreferences sharedPreferences;
+
+    private Button logOutBtn;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
@@ -58,6 +61,13 @@ public class UserInfoActivity extends BaseActivity {
         }
 
         setupClickListeners();
+        logOutBtn = findViewById(R.id.logoutButton);
+
+        logOutBtn.setOnClickListener(v -> {
+            mAuth.signOut();
+            Intent intent = new Intent(UserInfoActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void initViews() {
@@ -115,7 +125,6 @@ public class UserInfoActivity extends BaseActivity {
         }
     }
 
-
     private void setupBottomNavigation() {
         bottomNavigation.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
@@ -147,10 +156,18 @@ public class UserInfoActivity extends BaseActivity {
                     if (documentSnapshot.exists()) {
                         String username = documentSnapshot.getString("username");
                         String email = documentSnapshot.getString("email");
+
+                        // Also get email from Firebase Auth if not in Firestore
+                        FirebaseUser currentUser = mAuth.getCurrentUser();
+                        if (email == null && currentUser != null) {
+                            email = currentUser.getEmail();
+                        }
+
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(KEY_USERNAME, username != null ? username : "Guest User");
                         editor.putString(KEY_EMAIL, email != null ? email : "guest@example.com");
                         editor.apply();
+
                         tvUsername.setText(username != null ? username : "Guest User");
                         tvEmail.setText(email != null ? email : "guest@example.com");
 
@@ -175,43 +192,68 @@ public class UserInfoActivity extends BaseActivity {
         dialog.setContentView(R.layout.dialog_update_user);
         dialog.setCancelable(true);
 
+        // Initialize views
         TextInputLayout tilUsername = dialog.findViewById(R.id.til_username);
         TextInputEditText etUsername = dialog.findViewById(R.id.et_username);
+        TextInputLayout tilEmail = dialog.findViewById(R.id.til_email);
+        TextInputEditText etEmail = dialog.findViewById(R.id.et_email);
+        TextInputLayout tilPassword = dialog.findViewById(R.id.til_password);
+        TextInputEditText etPassword = dialog.findViewById(R.id.et_password);
         Button btnSave = dialog.findViewById(R.id.btn_save);
         Button btnCancel = dialog.findViewById(R.id.btn_cancel);
 
+        // Pre-fill current data
         String currentUsername = sharedPreferences.getString(KEY_USERNAME, "");
+        String currentEmail = sharedPreferences.getString(KEY_EMAIL, "");
         etUsername.setText(currentUsername);
+        etEmail.setText(currentEmail);
 
         btnSave.setOnClickListener(v -> {
             String newUsername = etUsername.getText().toString().trim();
+            String newEmail = etEmail.getText().toString().trim();
+            String newPassword = etPassword.getText().toString().trim();
 
+            // Clear previous errors
+            tilUsername.setError(null);
+            tilEmail.setError(null);
+            tilPassword.setError(null);
+
+            boolean hasErrors = false;
+
+            // Validate username
             if (newUsername.isEmpty()) {
                 tilUsername.setError("Username cannot be empty");
-                return;
-            }
-
-            if (newUsername.length() < 3) {
+                hasErrors = true;
+            } else if (newUsername.length() < 3) {
                 tilUsername.setError("Username must be at least 3 characters");
+                hasErrors = true;
+            }
+
+            // Validate email
+            if (newEmail.isEmpty()) {
+                tilEmail.setError("Email cannot be empty");
+                hasErrors = true;
+            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
+                tilEmail.setError("Please enter a valid email address");
+                hasErrors = true;
+            }
+
+            // Validate password if provided
+            if (!newPassword.isEmpty() && newPassword.length() < 6) {
+                tilPassword.setError("Password must be at least 6 characters");
+                hasErrors = true;
+            }
+
+            if (hasErrors) {
                 return;
             }
 
-            tilUsername.setError(null);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(KEY_USERNAME, newUsername);
-            editor.apply();
-            firestore.collection("users").document(userId)
-                    .update("username", newUsername)
-                    .addOnSuccessListener(aVoid -> {
-                        tvUsername.setText(newUsername);
-                        Toast.makeText(this, "Username updated successfully", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                        Log.d(TAG, "Username updated to: " + newUsername);
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to update username", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Firestore update failed", e);
-                    });
+            // Show progress
+            btnSave.setEnabled(false);
+            btnSave.setText("Updating...");
+
+            // Update user information
+            updateUserInformation(dialog, newUsername, newEmail, newPassword);
         });
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
@@ -221,10 +263,106 @@ public class UserInfoActivity extends BaseActivity {
         Window window = dialog.getWindow();
         if (window != null) {
             window.setLayout(
-                    (int) (getResources().getDisplayMetrics().widthPixels * 0.9),
+                    (int) (getResources().getDisplayMetrics().widthPixels * 0.95),
                     android.view.ViewGroup.LayoutParams.WRAP_CONTENT
             );
             window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+    }
+
+    private void updateUserInformation(Dialog dialog, String newUsername, String newEmail, String newPassword) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            resetDialogButton(dialog);
+            return;
+        }
+
+        // Start with updating username and email in Firestore
+        updateUsernameAndEmailInFirestore(dialog, newUsername, newEmail, newPassword);
+    }
+
+    private void updateUsernameAndEmailInFirestore(Dialog dialog, String newUsername, String newEmail, String newPassword) {
+        // Update username and email in Firestore
+        firestore.collection("users").document(userId)
+                .update("username", newUsername, "email", newEmail)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Firestore updated successfully");
+
+                    // Update Firebase Auth email if it's different
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null && !newEmail.equals(user.getEmail())) {
+                        updateFirebaseAuthEmail(dialog, user, newUsername, newEmail, newPassword);
+                    } else {
+                        // Email is the same, check if password needs to be updated
+                        if (!newPassword.isEmpty()) {
+                            updatePassword(dialog, user, newUsername, newEmail, newPassword);
+                        } else {
+                            // Only username updated, finish the process
+                            finishUpdate(dialog, newUsername, newEmail);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to update user information", Toast.LENGTH_SHORT).show();
+                    resetDialogButton(dialog);
+                    Log.e(TAG, "Firestore update failed", e);
+                });
+    }
+
+    private void updateFirebaseAuthEmail(Dialog dialog, FirebaseUser user, String newUsername, String newEmail, String newPassword) {
+        user.updateEmail(newEmail)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Firebase Auth email updated successfully");
+
+                    // Update password if provided
+                    if (!newPassword.isEmpty()) {
+                        updatePassword(dialog, user, newUsername, newEmail, newPassword);
+                    } else {
+                        finishUpdate(dialog, newUsername, newEmail);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to update email: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    resetDialogButton(dialog);
+                    Log.e(TAG, "Firebase Auth email update failed", e);
+                });
+    }
+
+    private void updatePassword(Dialog dialog, FirebaseUser user, String newUsername, String newEmail, String newPassword) {
+        user.updatePassword(newPassword)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Password updated successfully");
+                    finishUpdate(dialog, newUsername, newEmail);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to update password: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    resetDialogButton(dialog);
+                    Log.e(TAG, "Password update failed", e);
+                });
+    }
+
+    private void finishUpdate(Dialog dialog, String newUsername, String newEmail) {
+        // Update SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_USERNAME, newUsername);
+        editor.putString(KEY_EMAIL, newEmail);
+        editor.apply();
+
+        // Update UI
+        tvUsername.setText(newUsername);
+        tvEmail.setText(newEmail);
+
+        Toast.makeText(this, "Information updated successfully", Toast.LENGTH_SHORT).show();
+        dialog.dismiss();
+        Log.d(TAG, "User info updated - Username: " + newUsername + ", Email: " + newEmail);
+    }
+
+    private void resetDialogButton(Dialog dialog) {
+        Button btnSave = dialog.findViewById(R.id.btn_save);
+        if (btnSave != null) {
+            btnSave.setEnabled(true);
+            btnSave.setText("Update Information");
         }
     }
 

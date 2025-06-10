@@ -27,18 +27,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:gravity="start"
             android:orientation="vertical"
             android:padding="24dp">
 
             <!-- Avatar with initial -->
             <androidx.cardview.widget.CardView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginBottom="24dp"
                 app:cardBackgroundColor="#E8F5E8"
                 app:cardCornerRadius="40dp"
-                app:cardElevation="4dp">
+                >
 
                 <TextView
                     android:layout_width="match_parent"
@@ -47,7 +47,7 @@
                     android:gravity="center"
                     android:text="A"
                     android:textColor="#4CAF50"
-                    android:textSize="32sp" />
+                    android:textSize="16sp" />
 
             </androidx.cardview.widget.CardView>
 
@@ -76,40 +76,37 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
-                android:gravity="center"
+                android:gravity="end"
                 android:orientation="horizontal"
-                android:weightSum="2">
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
 
                 <!-- Update Information Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_update_info"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
+                    android:fontFamily="@font/play_regular"
                     android:text="Update Information"
+                    android:layout_marginEnd="8dp"
                     android:textColor="#1AC428"
                     app:backgroundTint="#FFFFFF"
                     app:cornerRadius="24dp"
                     app:strokeColor="#1AC428"
                     app:strokeWidth="2dp" />
 
-                <!-- Logout Button -->
+                <!-- Cancel Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/logoutButton"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
                     android:backgroundTint="#1AC428"
                     android:text="Logout"
                     android:textColor="#FFFFFF"
+                    android:fontFamily="@font/play_regular"
                     app:cornerRadius="24dp" />
+
             </LinearLayout>
-
-
         </LinearLayout>
 
     </ScrollView>

@@ -149,7 +149,7 @@ public class SportsNewsActivity extends BaseActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        cardParams.setMargins(dpToPx(16), dpToPx(8), dpToPx(16), dpToPx(16));
+        cardParams.setMargins(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
         cardView.setLayoutParams(cardParams);
         cardView.setCardElevation(dpToPx(8));
         cardView.setRadius(dpToPx(16));
@@ -208,7 +208,7 @@ public class SportsNewsActivity extends BaseActivity {
         );
         contentLayout.setLayoutParams(contentParams);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
-        contentLayout.setPadding(dpToPx(20), dpToPx(16), dpToPx(20), dpToPx(20));
+        contentLayout.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
         contentLayout.setBackgroundColor(Color.WHITE);
 
         // SECOND TITLE (below image, underlined)
