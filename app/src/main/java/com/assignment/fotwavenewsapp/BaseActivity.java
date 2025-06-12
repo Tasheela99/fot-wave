@@ -15,11 +15,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.graphics.drawable.Drawable;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -29,14 +27,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
     protected MaterialToolbar toolbar;
-    private Window window;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +44,7 @@ public class BaseActivity extends AppCompatActivity {
             window.setStatusBarColor(this.getResources().getColor(R.color.success_color));
         }
 
-        int color = ContextCompat.getColor(this, R.color.success_color); // Replace with your color
+        int color = ContextCompat.getColor(this, R.color.success_color);
         setStatusBarColorWithInsets(this, color);
 
     }
@@ -63,22 +58,16 @@ public class BaseActivity extends AppCompatActivity {
             decorView.setOnApplyWindowInsetsListener((v, insets) -> {
                 android.graphics.Insets statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars());
                 v.setBackgroundColor(color);
-
-                // Adjust padding to prevent overlap
                 v.setPadding(0, statusBarInsets.top, 0, 0);
 
                 return insets;
             });
         } else {
-            // For Android 14 and below
             window.setStatusBarColor(color);
         }
     }
     protected void showPopupMenu(View anchor) {
         try {
-            Log.d(TAG, "Creating popup menu");
-
-            // Create PopupMenu with custom theme
             Context wrapper = new ContextThemeWrapper(this, R.style.CustomPopupMenu);
             PopupMenu popupMenu = new PopupMenu(wrapper, anchor);
 
@@ -94,10 +83,7 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             popupMenu.setOnMenuItemClickListener(item -> {
-                // Your existing click handling code
                 int id = item.getItemId();
-                Log.d(TAG, "Popup menu item clicked: " + id);
-
                 if (id == R.id.menu_user_info) {
                     Intent intent = new Intent(this, UserInfoActivity.class);
                     startActivity(intent);
@@ -126,7 +112,6 @@ public class BaseActivity extends AppCompatActivity {
             popupMenu.show();
 
         } catch (Exception e) {
-            Log.e(TAG, "Error showing popup menu", e);
             Toast.makeText(this, "Error showing menu: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
@@ -138,7 +123,7 @@ public class BaseActivity extends AppCompatActivity {
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false); // Hide default title
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -190,22 +175,19 @@ public class BaseActivity extends AppCompatActivity {
     }
     public void configureStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Method 1: Use your existing setStatusBarColor method
             try {
                 setStatusBarColor(this, R.color.success_color);
             } catch (Exception e) {
                 try {
                     setStatusBarColor(this, R.color.primary_color);
                 } catch (Exception e2) {
-                    getWindow().setStatusBarColor(Color.parseColor("#4CAF50")); // Green color
+                    getWindow().setStatusBarColor(Color.parseColor("#4CAF50"));
                 }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 View decorView = getWindow().getDecorView();
                 decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }
-
-            Log.d(TAG, "Status bar color configured successfully");
         }
     }
 }

@@ -8,9 +8,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
@@ -44,12 +42,9 @@ public class DeveloperInfoActivity extends BaseActivity {
     }
 
     private void setupClickListeners() {
-        // Email Me Button Click Listener
         btnEmailMe.setOnClickListener(v -> {
             openEmailApp();
         });
-
-        // Call Me Button Click Listener
         btnCallMe.setOnClickListener(v -> {
             makePhoneCall();
         });
@@ -57,19 +52,13 @@ public class DeveloperInfoActivity extends BaseActivity {
 
     private void openEmailApp() {
         try {
-            // Create an email intent
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
             emailIntent.setData(Uri.parse("mailto:" + EMAIL_ADDRESS));
-
-            // Optional: Add subject and body
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Contact from News App");
             emailIntent.putExtra(Intent.EXTRA_TEXT, "Hello Tasheela,\n\nI would like to get in touch with you.\n\nBest regards,");
-
-            // Check if there's an email app available
             if (emailIntent.resolveActivity(getPackageManager()) != null) {
                 startActivity(Intent.createChooser(emailIntent, "Choose Email App"));
             } else {
-                // Fallback: Copy email to clipboard
                 copyEmailToClipboard();
             }
         } catch (Exception e) {
@@ -79,7 +68,6 @@ public class DeveloperInfoActivity extends BaseActivity {
     }
 
     private void copyEmailToClipboard() {
-        // Copy email to clipboard as fallback
         android.content.ClipboardManager clipboard =
                 (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         android.content.ClipData clip =
@@ -90,15 +78,11 @@ public class DeveloperInfoActivity extends BaseActivity {
 
     private void makePhoneCall() {
         try {
-            // Create a phone call intent
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
             callIntent.setData(Uri.parse("tel:" + PHONE_NUMBER));
-
-            // Check if there's a phone app available
             if (callIntent.resolveActivity(getPackageManager()) != null) {
                 startActivity(callIntent);
             } else {
-                // Fallback: Copy phone number to clipboard
                 copyPhoneToClipboard();
             }
         } catch (Exception e) {
@@ -108,7 +92,6 @@ public class DeveloperInfoActivity extends BaseActivity {
     }
 
     private void copyPhoneToClipboard() {
-        // Copy phone number to clipboard as fallback
         android.content.ClipboardManager clipboard =
                 (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         android.content.ClipData clip =
@@ -121,7 +104,6 @@ public class DeveloperInfoActivity extends BaseActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
-
                 if (itemId == R.id.nav_academic) {
                     startActivity(new Intent(DeveloperInfoActivity.this, AcademicNewsActivity.class));
                     overridePendingTransition(0, 0);

@@ -6,18 +6,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -78,51 +75,6 @@ public class UserInfoActivity extends BaseActivity {
         bottomNavigation = findViewById(R.id.bottom_navigation);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-    }
-
-    private void setupToolbar() {
-        setSupportActionBar(toolbar);
-
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (firebaseUser != null) {
-            String uid = firebaseUser.getUid();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-            db.collection("users").document(uid).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        String username = "User";
-                        if (documentSnapshot.exists()) {
-                            username = documentSnapshot.getString("username");
-                            if (username == null || username.isEmpty()) {
-                                username = firebaseUser.getEmail().split("@")[0];
-                            }
-                        }
-
-                        if (getSupportActionBar() != null) {
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                            getSupportActionBar().setTitle(username);
-                        }
-
-                        toolbar.setNavigationOnClickListener(v -> onBackPressed());
-                    })
-                    .addOnFailureListener(e -> {
-                        if (getSupportActionBar() != null) {
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                            getSupportActionBar().setTitle("User");
-                        }
-
-                        toolbar.setNavigationOnClickListener(v -> onBackPressed());
-                    });
-
-        } else {
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setTitle("User");
-            }
-
-            toolbar.setNavigationOnClickListener(v -> onBackPressed());
-        }
     }
 
     private void setupBottomNavigation() {
@@ -287,18 +239,13 @@ public class UserInfoActivity extends BaseActivity {
         firestore.collection("users").document(userId)
                 .update("username", newUsername, "email", newEmail)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Firestore updated successfully");
-
-                    // Update Firebase Auth email if it's different
                     FirebaseUser user = mAuth.getCurrentUser();
                     if (user != null && !newEmail.equals(user.getEmail())) {
                         updateFirebaseAuthEmail(dialog, user, newUsername, newEmail, newPassword);
                     } else {
-                        // Email is the same, check if password needs to be updated
                         if (!newPassword.isEmpty()) {
                             updatePassword(dialog, user, newUsername, newEmail, newPassword);
                         } else {
-                            // Only username updated, finish the process
                             finishUpdate(dialog, newUsername, newEmail);
                         }
                     }
@@ -364,14 +311,5 @@ public class UserInfoActivity extends BaseActivity {
             btnSave.setEnabled(true);
             btnSave.setText("Update Information");
         }
-    }
-
-    // Optional utility method to save user data
-    public static void saveUserData(android.content.Context context, String username, String email) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(KEY_USERNAME, username);
-        editor.putString(KEY_EMAIL, email);
-        editor.apply();
     }
 }

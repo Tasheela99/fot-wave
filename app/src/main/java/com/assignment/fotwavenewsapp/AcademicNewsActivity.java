@@ -5,16 +5,12 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,7 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.assignment.fotwavenewsapp.model.News;
@@ -63,7 +58,6 @@ public class AcademicNewsActivity extends BaseActivity {
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Find the LinearLayout inside ScrollView where cards will be added
         newsContainer = findViewById(R.id.news_container);
         if (newsContainer == null) {
             Log.e(TAG, "news_container not found in layout");
@@ -180,7 +174,6 @@ public class AcademicNewsActivity extends BaseActivity {
 
         topTitleContainer.addView(topTitleTextView);
 
-        // Image View
         ImageView imageView = new ImageView(this);
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -199,7 +192,6 @@ public class AcademicNewsActivity extends BaseActivity {
             imageView.setImageResource(R.drawable.ic_launcher_foreground);
         }
 
-        // Content Layout
         LinearLayout contentLayout = new LinearLayout(this);
         LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -337,17 +329,14 @@ public class AcademicNewsActivity extends BaseActivity {
             }
         }
 
-        // Add all views to content layout
-        contentLayout.addView(titleBelowTextView); // Second title (underlined)
+        contentLayout.addView(titleBelowTextView);
         contentLayout.addView(dateTextView);
         contentLayout.addView(descriptionTextView);
         contentLayout.addView(buttonLayout);
 
-        // Add to main layout IN CORRECT ORDER
-        mainLayout.addView(topTitleContainer); // FIRST: Top title
-        mainLayout.addView(imageView);         // SECOND: Image
-        mainLayout.addView(contentLayout);     // THIRD: Content with second title, date, description, button
-
+        mainLayout.addView(topTitleContainer);
+        mainLayout.addView(imageView);
+        mainLayout.addView(contentLayout);
         cardView.addView(mainLayout);
         newsContainer.addView(cardView);
     }

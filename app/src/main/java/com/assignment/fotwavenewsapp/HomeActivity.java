@@ -5,16 +5,12 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,7 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.assignment.fotwavenewsapp.model.News;
@@ -123,14 +118,10 @@ public class HomeActivity extends BaseActivity {
             Log.e(TAG, "newsContainer is null, cannot display news");
             return;
         }
-
-        // Clear existing views except the first example card (optional)
         newsContainer.removeAllViews();
-
         for (News news : academicList) {
             createNewsCard(news);
         }
-
         if (academicList.isEmpty()) {
             showNoNewsMessage();
         }
@@ -334,16 +325,13 @@ public class HomeActivity extends BaseActivity {
             }
         }
 
-        // Add all views to content layout
-        contentLayout.addView(titleBelowTextView); // Second title (underlined)
+        contentLayout.addView(titleBelowTextView);
         contentLayout.addView(dateTextView);
         contentLayout.addView(descriptionTextView);
         contentLayout.addView(buttonLayout);
-
-        // Add to main layout IN CORRECT ORDER
-        mainLayout.addView(topTitleContainer); // FIRST: Top title
-        mainLayout.addView(imageView);         // SECOND: Image
-        mainLayout.addView(contentLayout);     // THIRD: Content with second title, date, description, button
+        mainLayout.addView(topTitleContainer);
+        mainLayout.addView(imageView);
+        mainLayout.addView(contentLayout);
 
         cardView.addView(mainLayout);
         newsContainer.addView(cardView);

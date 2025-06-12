@@ -40,7 +40,6 @@ public class NewsDetailActivity extends BaseActivity {
         setupToolbarWithUsername();
 
         backBtn.setOnClickListener(v -> {
-            // Navigate back to the correct activity based on source
             Intent intent;
             switch (sourceActivity) {
                 case "events":
