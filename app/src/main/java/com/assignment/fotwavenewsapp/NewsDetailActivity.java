@@ -5,36 +5,67 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.squareup.picasso.Picasso;
 
-public class NewsDetailActivity extends AppCompatActivity {
+public class NewsDetailActivity extends BaseActivity {
 
     private ImageView newsImageView;
     private TextView newsTitleTextView;
     private TextView newsDateTextView;
-    private TextView newsContentTextView;
     private TextView newsDescriptionTextView;
     private MaterialToolbar toolbar;
+    private BottomNavigationView bottomNavigationView;
+    private String sourceActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_detail);
+        MaterialButton backBtn = findViewById(R.id.back);
+
+        sourceActivity = getIntent().getStringExtra("source_activity");
+        if (sourceActivity == null) {
+            sourceActivity = "academic";
+        }
 
         initializeViews();
-        setupToolbar();
         loadNewsData();
+        setupBottomNavigation();
+
+        setupToolbarWithUsername();
+
+        backBtn.setOnClickListener(v -> {
+            Intent intent;
+            switch (sourceActivity) {
+                case "events":
+                    intent = new Intent(NewsDetailActivity.this, EventsNewsActivity.class);
+                    break;
+                case "sports":
+                    intent = new Intent(NewsDetailActivity.this, SportsNewsActivity.class);
+                    break;
+                case "academic":
+                default:
+                    intent = new Intent(NewsDetailActivity.this, AcademicNewsActivity.class);
+                    break;
+            }
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void initializeViews() {
         newsImageView = findViewById(R.id.news_detail_image);
         newsTitleTextView = findViewById(R.id.news_detail_title);
         newsDateTextView = findViewById(R.id.news_detail_date);
-        newsContentTextView = findViewById(R.id.news_detail_content);
         newsDescriptionTextView = findViewById(R.id.news_detail_description);
         toolbar = findViewById(R.id.toolbar);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
     }
 
     private void setupToolbar() {
@@ -57,7 +88,6 @@ public class NewsDetailActivity extends AppCompatActivity {
 
             // Set data to views
             newsTitleTextView.setText(title != null ? title : "No Title");
-            newsContentTextView.setText(content != null ? content : "No Content");
             newsDescriptionTextView.setText(description != null ? description : "No Description");
             newsDateTextView.setText(date != null ? date : "No Date");
 
@@ -72,6 +102,47 @@ public class NewsDetailActivity extends AppCompatActivity {
                 newsImageView.setImageResource(R.drawable.ic_launcher_foreground);
             }
         }
+    }
+
+    private void setupBottomNavigation() {
+        // Set the selected item based on source activity
+        switch (sourceActivity) {
+            case "events":
+                bottomNavigationView.setSelectedItemId(R.id.nav_events);
+                break;
+            case "sports":
+                bottomNavigationView.setSelectedItemId(R.id.nav_sports);
+                break;
+            case "academic":
+            default:
+                bottomNavigationView.setSelectedItemId(R.id.nav_academic);
+                break;
+        }
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_sports) {
+                    startActivity(new Intent(NewsDetailActivity.this, SportsNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_events) {
+                    startActivity(new Intent(NewsDetailActivity.this, EventsNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_academic) {
+                    startActivity(new Intent(NewsDetailActivity.this, AcademicNewsActivity.class));
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override

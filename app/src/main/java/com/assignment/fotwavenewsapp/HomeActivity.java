@@ -32,34 +32,29 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SportsNewsActivity extends BaseActivity {
-    private static final String TAG = "SportsNewsActivity";
+public class HomeActivity extends BaseActivity {
+    private static final String TAG = "HomeActivity";
     private BottomNavigationView bottomNavigationView;
     private LinearLayout newsContainer;
     private FirebaseFirestore db;
-    private List<News> sportsList;
+    private List<News> academicList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sports_news);
-
+        setContentView(R.layout.activity_home);
         initializeViews();
         setupBottomNavigation();
         setupFirestore();
-        fetchSportsNews();
-
+        fetchAcademicNews();
+        configureStatusBar();
         setupToolbarWithUsername();
     }
 
     private void initializeViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.nav_sports);
-
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Find the LinearLayout inside ScrollView where cards will be added
         newsContainer = findViewById(R.id.news_container);
         if (newsContainer == null) {
             Log.e(TAG, "news_container not found in layout");
@@ -71,18 +66,20 @@ public class SportsNewsActivity extends BaseActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
-                if (itemId == R.id.nav_academic) {
-                    startActivity(new Intent(SportsNewsActivity.this, AcademicNewsActivity.class));
+
+                if (itemId == R.id.nav_sports) {
+                    startActivity(new Intent(HomeActivity.this, SportsNewsActivity.class));
                     overridePendingTransition(0, 0);
                     return true;
                 } else if (itemId == R.id.nav_events) {
-                    startActivity(new Intent(SportsNewsActivity.this, EventsNewsActivity.class));
+                    startActivity(new Intent(HomeActivity.this, EventsNewsActivity.class));
                     overridePendingTransition(0, 0);
                     return true;
-                } else if (itemId == R.id.nav_sports) {
+                } else if (itemId == R.id.nav_academic) {
+                    startActivity(new Intent(HomeActivity.this, AcademicNewsActivity.class));
+                    overridePendingTransition(0, 0);
                     return true;
                 }
-
                 return false;
             }
         });
@@ -90,30 +87,29 @@ public class SportsNewsActivity extends BaseActivity {
 
     private void setupFirestore() {
         db = FirebaseFirestore.getInstance();
-        sportsList = new ArrayList<>();
+        academicList = new ArrayList<>();
     }
 
-    private void fetchSportsNews() {
+    private void fetchAcademicNews() {
         db.collection("news")
-                .whereEqualTo("newsType", "sports")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        sportsList.clear();
+                        academicList.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             News news = document.toObject(News.class);
-                            sportsList.add(news);
+                            academicList.add(news);
                             Log.d(TAG, "News fetched: " + news.getTitle());
                         }
                         displayNews();
                     } else {
                         Log.w(TAG, "Error getting documents.", task.getException());
-                        Toast.makeText(SportsNewsActivity.this, "Failed to fetch news", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, "Failed to fetch news", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error fetching sports news", e);
-                    Toast.makeText(SportsNewsActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error fetching academic news", e);
+                    Toast.makeText(HomeActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -123,12 +119,10 @@ public class SportsNewsActivity extends BaseActivity {
             return;
         }
         newsContainer.removeAllViews();
-
-        for (News news : sportsList) {
+        for (News news : academicList) {
             createNewsCard(news);
         }
-
-        if (sportsList.isEmpty()) {
+        if (academicList.isEmpty()) {
             showNoNewsMessage();
         }
     }
@@ -161,7 +155,7 @@ public class SportsNewsActivity extends BaseActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
-        topTitleContainer.setPadding(dpToPx(20), dpToPx(16), dpToPx(20), dpToPx(8));
+        topTitleContainer.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
         topTitleContainer.setBackgroundColor(Color.WHITE);
 
         TextView topTitleTextView = new TextView(this);
@@ -201,7 +195,7 @@ public class SportsNewsActivity extends BaseActivity {
         );
         contentLayout.setLayoutParams(contentParams);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
-        contentLayout.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
+        contentLayout.setPadding(dpToPx(20), dpToPx(16), dpToPx(20), dpToPx(20));
         contentLayout.setBackgroundColor(Color.WHITE);
 
         // SECOND TITLE (below image, underlined)
@@ -276,13 +270,13 @@ public class SportsNewsActivity extends BaseActivity {
         readButton.setAllCaps(false);
         readButton.setTypeface(playRegular);
         readButton.setOnClickListener(v -> {
-            Intent intent = new Intent(SportsNewsActivity.this, NewsDetailActivity.class);
+            Intent intent = new Intent(HomeActivity.this, NewsDetailActivity.class);
             intent.putExtra("news_title", news.getTitle());
             intent.putExtra("news_content", news.getContent());
             intent.putExtra("news_description", news.getDescription());
             intent.putExtra("news_date", news.getDate());
             intent.putExtra("news_image_url", news.getImageUrl());
-            intent.putExtra("source_activity", "sports");
+            intent.putExtra("source_activity", "academic");
             startActivity(intent);
         });
 
@@ -318,7 +312,7 @@ public class SportsNewsActivity extends BaseActivity {
                                     snapshot.getReference().delete()
                                             .addOnSuccessListener(aVoid -> {
                                                 Toast.makeText(this, "News deleted", Toast.LENGTH_SHORT).show();
-                                                fetchSportsNews();
+                                                fetchAcademicNews();
                                             })
                                             .addOnFailureListener(e -> {
                                                 Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show();
@@ -335,7 +329,6 @@ public class SportsNewsActivity extends BaseActivity {
         contentLayout.addView(dateTextView);
         contentLayout.addView(descriptionTextView);
         contentLayout.addView(buttonLayout);
-
         mainLayout.addView(topTitleContainer);
         mainLayout.addView(imageView);
         mainLayout.addView(contentLayout);
@@ -343,7 +336,6 @@ public class SportsNewsActivity extends BaseActivity {
         cardView.addView(mainLayout);
         newsContainer.addView(cardView);
     }
-
 
     private void showNoNewsMessage() {
         TextView noNewsText = new TextView(this);
@@ -353,7 +345,7 @@ public class SportsNewsActivity extends BaseActivity {
         );
         params.setMargins(0, dpToPx(32), 0, 0);
         noNewsText.setLayoutParams(params);
-        noNewsText.setText("No sports news available at the moment.");
+        noNewsText.setText("No academic news available at the moment.");
         noNewsText.setTextSize(16);
         noNewsText.setTextColor(0xFF666666);
         noNewsText.setGravity(android.view.Gravity.CENTER);

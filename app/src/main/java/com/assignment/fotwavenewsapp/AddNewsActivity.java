@@ -17,7 +17,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,11 +59,12 @@ public class AddNewsActivity extends BaseActivity {
         setContentView(R.layout.activity_add_news);
 
         initializeViews();
-        setupToolbar();
         setupBottomNavigation();
         setupFirebase();
         setupSpinner();
         setupClickListeners();
+
+        setupToolbarWithUsername();
     }
 
     private void initializeViews() {
@@ -79,16 +79,7 @@ public class AddNewsActivity extends BaseActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
     }
 
-    private void setupToolbar() {
-        MaterialToolbar toolbar = findViewById(R.id.dropdown_anchor);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
     private void setupBottomNavigation() {
-        // Don't set any item as selected for AddNews activity
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -128,7 +119,6 @@ public class AddNewsActivity extends BaseActivity {
     }
 
     private void setupSpinner() {
-        // Create news type options
         String[] newsTypes = {"academic", "events", "sports"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, newsTypes);
@@ -198,11 +188,9 @@ public class AddNewsActivity extends BaseActivity {
             return;
         }
 
-        // Disable submit button to prevent double submission
         btnSubmit.setEnabled(false);
         btnSubmit.setText("Submitting...");
 
-        // Upload image first
         uploadImageAndSubmitNews(title, subtitle, content, date, newsType);
     }
 
@@ -235,26 +223,21 @@ public class AddNewsActivity extends BaseActivity {
     }
 
     private void saveNewsToFirestore(String title, String subtitle, String content, String date, String newsType, String imageUrl) {
-        // Prepare news data map
         Map<String, Object> newsData = new HashMap<>();
         newsData.put("title", title);
         newsData.put("subtitle", subtitle);
-        newsData.put("description", content); // Using 'description' to match your News model
+        newsData.put("description", content);
         newsData.put("date", date);
         newsData.put("imageUrl", imageUrl);
         newsData.put("newsType", newsType);
-        newsData.put("timestamp", System.currentTimeMillis()); // Add timestamp for ordering
-
-        Log.d(TAG, "Saving news to Firestore: " + newsData.toString());
-
-        // Save news document to Firestore
+        newsData.put("timestamp", System.currentTimeMillis());
         firestore.collection("news")
                 .add(newsData)
                 .addOnSuccessListener(documentReference -> {
                     Log.d(TAG, "News document written with ID: " + documentReference.getId());
                     Toast.makeText(this, "News submitted successfully!", Toast.LENGTH_SHORT).show();
                     clearForm();
-                    finish(); // Go back to previous activity
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error adding news document", e);
